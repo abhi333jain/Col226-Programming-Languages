@@ -63,15 +63,15 @@ fun convertDelimiters1(infilename, delim1, outfilename, delim2) =
 					else 	(* c is in middle/end of field *)
 
 
-						if(hasdq=0)	then(*  field is not enclosed in dq *)
+						if(hasdq=0)	then(*  field is not enclosed in dq , but in output file we will enclose it in dq*)
 
-							if(isnextchar(delim1)=true) then 	(* c is the last char of field *)
-								( output(outfile,c); output(outfile,"\""); output(outfile,str(delim2)); 
-								inputN(infile,1);  (* leave the next char i.e delimeter *)	iter(cnt+1,fields,record_no,0,1,0))
+							if(c=str(delim1)) then 	(* end of a field *)
+								( output(outfile,"\""); output(outfile,str(delim2)); 
+								iter(cnt+1,fields,record_no,0,1,0))
 
-							else if(isnextchar(#"\n")=true) then	(*end of record *)
-								if(record_no=1 orelse fields=cnt) then ( output(outfile,c);  output(outfile,"\""); output(outfile,"\n"); 
-								inputN(infile,1);   (* leave the next char i.e EOL *)	iter(1,cnt,record_no+1,0,1,1))
+							else if(c="\n") then	(*end of record *)
+								if(record_no=1 orelse fields=cnt) then ( output(outfile,"\""); output(outfile,"\n"); 
+										iter(1,cnt,record_no+1,0,1,1))
 								else raise UnevenFields(fields,cnt,record_no)
 
 							else if(c="\"") then raise FieldNotEnclosedinDq(*raise error as field is not enclosed in " "*)
@@ -107,7 +107,7 @@ fun convertDelimiters1(infilename, delim1, outfilename, delim2) =
 
 fun convertDelimiters(infilename, delim1, outfilename, delim2) = convertDelimiters1(infilename, delim1, outfilename, delim2) handle
 													UnevenFields(fields,cnt,record_no) => (
-														print("exception UnevenFields of string \n");
+													(*	print("exception UnevenFields of string \n"); *)
 														print("Expected: ");
 														print(Int.toString(fields));
 														print(" fields, ");
@@ -124,6 +124,8 @@ fun convertDelimiters(infilename, delim1, outfilename, delim2) = convertDelimite
 fun csv2tsv(infilename, outfilename) = convertDelimiters(infilename, #",", outfilename, #"\t") 
 
 fun tsv2csv(infilename, outfilename) = convertDelimiters(infilename, #"\t" , outfilename, #",") 
+
+
 
 
 
