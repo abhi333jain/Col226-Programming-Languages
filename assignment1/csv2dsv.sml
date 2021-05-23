@@ -1,5 +1,5 @@
 open TextIO;
-exception UnevenFields of int*int*int;
+exception UnevenFields of string;
 exception emptyInputFile
 exception NotTerminatedByEOL
 exception FieldNotEnclosedinDq
@@ -26,6 +26,9 @@ fun convertDelimiters1(infilename, delim1, outfilename, delim2) =
 				not (isSome(x))
 			end;			
 
+		(*generates output to be printed on console*)	
+		fun exception_message(fields,cnt,record_no) = ("Expected: "^Int.toString(fields)^" fields, "^"Present: "^Int.toString(cnt)^" fields on Line "^Int.toString(record_no)^"\n" )													
+
 (* cnt => stores number of fields iterated upon in the current record *)
 (* fields =>  number of fields in the first record *)
 (* record_no => stores the current line number *)
@@ -48,7 +51,7 @@ fun convertDelimiters1(infilename, delim1, outfilename, delim2) =
 	
 						else if(c="\n") then (*check for empty field followed by eol i.e end of record *)
 							if(record_no=1 orelse fields=cnt) then (output(outfile,"\n"); iter(1,cnt,record_no+1,0,1,1))
-							else raise UnevenFields(fields,cnt,record_no)
+							else raise UnevenFields(exception_message(fields,cnt,record_no))
 
 						else if(c="\"") then  (*field is enclosed in dq *)
 							( output(outfile,c); iter(cnt,fields,record_no,1,0,0))
@@ -68,7 +71,7 @@ fun convertDelimiters1(infilename, delim1, outfilename, delim2) =
 							else if(c="\n") then	(*end of record *)
 								if(record_no=1 orelse fields=cnt) then ( output(outfile,"\""); output(outfile,"\n"); 
 										iter(1,cnt,record_no+1,0,1,1))
-								else raise UnevenFields(fields,cnt,record_no)
+								else raise UnevenFields(exception_message(fields,cnt,record_no))
 
 							else if(c="\"") then raise FieldNotEnclosedinDq(*raise error as field is not enclosed in " "*)
 							else	
@@ -83,7 +86,7 @@ fun convertDelimiters1(infilename, delim1, outfilename, delim2) =
 							else if(isnextchar(#"\n")=true) then	  (* end of record *)
 								if(record_no=1 orelse fields=cnt) then ( output(outfile,c); output(outfile,"\n"); 
 								inputN(infile,1);   (* leave the next char i.e EOL *)	iter(1,cnt,record_no+1,0,1,1))
-								else raise UnevenFields(fields,cnt,record_no)
+								else raise UnevenFields(exception_message(fields,cnt,record_no))
 
 							else if(isnextchar(#"\"")=true) then 	(* dq inside a field occur in pair i.e "" *)
 								( output(outfile,c); output(outfile,c); 
@@ -102,17 +105,7 @@ fun convertDelimiters1(infilename, delim1, outfilename, delim2) =
 	end;
 
 fun convertDelimiters(infilename, delim1, outfilename, delim2) = convertDelimiters1(infilename, delim1, outfilename, delim2) handle
-													UnevenFields(fields,cnt,record_no) => (
-													(*	print("exception UnevenFields of string \n"); *)
-														print("Expected: ");
-														print(Int.toString(fields));
-														print(" fields, ");
-														print("Present: ");
-														print(Int.toString(cnt));
-														print(" fields on Line ");	
-														print(Int.toString(record_no));
-														print("\n")													
-														)
+													UnevenFields(message) => (	print(message)	) ;
 
 
 fun csv2tsv(infilename, outfilename) = convertDelimiters(infilename, #",", outfilename, #"\t") 

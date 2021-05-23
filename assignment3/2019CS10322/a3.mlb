@@ -1,0 +1,12 @@
+local
+ $(SML_LIB)/basis/basis.mlb
+ $(SML_LIB)/mlyacc-lib/mlyacc-lib.mlb
+ ast.sml
+ eval3.sml
+ typechecker.sml
+ Combined.yacc.sig
+ Combined.yacc.sml
+ Combined.lex.sml
+in
+  "load-Combined.sml";
+end

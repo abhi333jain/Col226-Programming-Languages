@@ -1,0 +1,25 @@
+program ::= {statement}.
+statement ::= formula TERM .
+formula ::= noncond | cond | noncond binop cond | noncond IMPLIES cond .
+cond ::= IF formula THEN formula ELSE formula | NOT cond .
+noncond ::= nonimplicative | nonimplicative IMPLIES noncond .
+nonimplicative ::= factor | nonimplicative binop factor .
+factor ::= ID | CONST | NOT factor | LPAREN formula RPAREN .
+binop ::= AND | OR | XOR | EQUALS .
+AND := "AND" .
+OR := "OR" .
+XOR := "XOR" .
+EQUALS := "EQUALS" .
+IF := "IF" .
+THEN := "THEN" .
+ELSE := "ELSE" .
+LPAREN := "(" .
+RPAREN := ")" .
+TERM := ";" .
+ID ::= Char{Char}.
+Char := “A” | “B” | “C” | “D” | “E” | “F” | “G” | “H” |“I” | “J” | “K” | “L” | “M” | “N” | “O” | “P” | “Q” |
+		“R” | “S” | “T” | “U” | “V ” | “W” | “X” | “Y ” | “Z”|“a” | “b” | “c” | “d” | “e” | “f” | “g” | “h” |
+		“i” | “j” | “k” | “l” | “m” | “n” | “o” | “p” | “q” |“r” | “s” | “t” | “u” | “v” | “w” | “x” | “y” | “z” .
+
+
+
